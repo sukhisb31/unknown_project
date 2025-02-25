@@ -52,6 +52,7 @@ const userSchema = new mongoose.Schema({
         },
         paypal :{
             paypalEmail : String,
+
         }
     },
     role : {
