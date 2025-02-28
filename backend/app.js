@@ -5,6 +5,7 @@ import fileUpload from "express-fileupload";
 import userRouter from "./routers/userRouters.js";
 import cors from "cors";
 import { errorMiddleware } from "./middlewares/error.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use (
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(cookieParser());
 app.use(fileUpload({
     useTempFiles : true,
     tempFileDir : "/tmp/"
