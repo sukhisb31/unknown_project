@@ -79,25 +79,25 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-// password converted into hash
-userSchema.pre("save", async function(next){
+//password convert into hash format
+userSchema.pre("save", async function (next){
     if(!this.isModified("password")){
         next();
-    };
+    }
     this.password = await bcrypt.hash(this.password, 10);
 });
 
-// compare password
+//compare password
 userSchema.methods.comparePassword = async function(enteredPassword){
-    return await bcrypt.compare(enteredPassword.password);
-}
+    return await bcrypt.compare(enteredPassword, this.password);
+};
 
-//generate jwt token
-userSchema.methods.getJwtToken = () => {
-    return jwt.sign (
-        {id: this._id},
-        process.env.JWT_SECRET,
-        {expiresIn : process.env.JWT_EXPIRE },
+//generate web token 
+userSchema.methods.generateJsonWebToken = function (){
+    return jwt.sign(
+        {id : this._id},
+        process.env.JWT_SECRET_KEY,
+        {expiresIn : process.env.JWT_EXPIRE_KEY},
     )
 }
 
