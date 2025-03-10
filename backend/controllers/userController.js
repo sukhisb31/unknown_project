@@ -100,29 +100,30 @@ export const register = catchAsyncError(async (req, res, next) => {
     next(new ErrorHandler(error.message, 500));
 }
 });
-// check login user is valid or not
-export const login = catchAsyncError(async(req, res, next) => {
+
+// check user login valid or not
+export const login = catchAsyncError(async(req, res, next)=> {
+    //get email and password from body 
     const {email, password} = req.body;
-    if(!email || !password) {
-        return next (new ErrorHandler ("Both fields are required to fill", 400));
-    };
-
-    // check user is valid or not
+    // check user is valid or not 
     const user = await User.findOne({email}).select("+password");
-    if(!user){
-        return next (new ErrorHandler("User not found", 400));
+    // check email or password is valid or not and and fill both fields
+    if(!email || !password) {
+        return next (new ErrorHandler("Fill both fields both are required to fill", 400));
     };
-
-    // check password matched or not
+    // check password is matched or not
     const isPasswordMatch = await user.comparePassword(password);
-    if(!isPasswordMatch) {
-        return next (new ErrorHandler("Password is not matched", 400));
+    // check password is matched or not if password is not matched then give error
+    if(!isPasswordMatch){
+        return next (new ErrorHandler("Invalid Credentials", 400));
     };
-    generateToken(user, "Login successfully", 201 , res);
+    // if email and password is correct then response successfully login
+    generateToken( user, "Login Successfully", 201, res); 
+
 });
 
-// get Profile
-export const getProfile = catchAsyncError(async(req, res, next)=>{
+// get profile
+export const getProfile = catchAsyncError(async(req, res, next) =>{
     const user = req.user;
     res.status(200).json({
         success : true,
@@ -130,23 +131,23 @@ export const getProfile = catchAsyncError(async(req, res, next)=>{
     });
 });
 
-// logout
-export const logOut = catchAsyncError(async(req, res, next) =>{
-    res.status(200).cookie("token", "", {
+//logout function
+export const logout = catchAsyncError(async(req, res, next) => {
+    res.status(200).cookie("token", TokenExpiredError, {
         expires : new Date(Date.now()),
         httpOnly : true,
     }).json({
         success : true,
-        message : "Logout Successfully",
+        message : "Logout Successfully"
     });
 });
 
-// fetch leaderboard
+// fetch leadership Board
 export const fetchLeaderBoard = catchAsyncError(async(req, res, next) => {
     const users = await User.find({moneySpent : {$gt : 0}});
-    const leaderboard = users.sort((a,b)=> b.moneySpent - a.moneySpent);
+    const leaderBoard = users.sort((a,b)=> b.moneySpent - a.moneySpent);
     res.status(200).json({
         success : true,
-        leaderboard
+        leaderBoard,
     })
 })
